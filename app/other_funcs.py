@@ -1,4 +1,3 @@
-from random import choice
 import math
 
 
@@ -24,6 +23,14 @@ def main(data):
 
             bodys.append((temp_x,temp_y))
 
+    snake_heads = []
+    for snake in data["board"]["snakes"]:
+        if((snake["body"][0]["y"] != head_y) and (snake["body"][0]["x"] != head_x)):
+            snake_heads.append((snake["body"][0]["x"],snake["body"][0]["y"]))
+
+    print ("RIGHT HERE:", snake_heads)
+
+
     '''print("head_x:",head_x)
     print("head_y:",head_y)
     print("board_width:",board_width)
@@ -37,10 +44,10 @@ def main(data):
 
     if (health <= 30):
         narest_food_coordinates = get_nearest_food(food, head_x, head_y)
-        d = go_towards(bodys, board_width, board_height, head_x, head_y, narest_food_coordinates[0], narest_food_coordinates[1])
+        d = go_towards(bodys, board_width, board_height, head_x, head_y, narest_food_coordinates[0], narest_food_coordinates[1], snake_heads)
     else:
-        safe_space(bodys,board_width,board_height,d,head_x,head_y)
-        
+        safe_space(bodys,board_width,board_height,d,head_x,head_y,snake_heads)
+
 
     print("d in main:", d)
 
@@ -56,7 +63,30 @@ def main(data):
 #               ---------------------------- ALL FUNCTIONS BELOW THIS LINE ------------------------------------------
 
 
-def go_towards(bodys,board_width,board_height,head_x,head_y, goto_x, goto_y): # goes towards a given point (to get food for now)
+def are_snakesheades_around(heads,x,y):
+    result = False
+
+    for item in heads:
+        if (x+1==item[0] and y==item[1]):
+            result = True
+        if (x-1==item[0] and y==item[1]):
+            result = True
+        if (x==item[0] and y+1==item[1]):
+            result = True
+        if (x==item[0] and y-1==item[1]):
+            result = True
+
+    if(result==True):
+        print("YAAAAAASSSS")
+
+
+
+    return result
+
+
+
+
+def go_towards(bodys,board_width,board_height,head_x,head_y, goto_x, goto_y,head): # goes towards a given point (to get food for now)
     prioratized_directions = []
 
     if (head_x <= goto_x):
@@ -77,7 +107,7 @@ def go_towards(bodys,board_width,board_height,head_x,head_y, goto_x, goto_y): # 
         prioratized_directions.insert(0, "up")
         prioratized_directions.append("down")
 
-    safe_space(bodys,board_width,board_height,prioratized_directions,head_x,head_y)
+    safe_space(bodys,board_width,board_height,prioratized_directions,head_x,head_y,head)
 
 
     print("IN FUNCTION:", prioratized_directions)
@@ -117,7 +147,7 @@ def is_safe_space(bodys,board_width,board_height,x,y): # checks if a single spac
         return True
 
 
-def safe_space(bodys,board_width,board_height,d,x,y):#checks the four tiles around the space at x and y and modifies direction list
+def safe_space(bodys,board_width,board_height,d,x,y,snake_heads):#checks the four tiles around the space at x and y and modifies direction list
     if is_snake_body(bodys,x+1,y) or is_wall(board_width,board_height,x+1,y,"right"):#right
         d.remove("right")
     if is_snake_body(bodys,x-1,y) or is_wall(board_width,board_height,x-1,y,"left"):#left
@@ -126,7 +156,17 @@ def safe_space(bodys,board_width,board_height,d,x,y):#checks the four tiles arou
         d.remove("up")
     if is_snake_body(bodys,x,y+1) or is_wall(board_width,board_height,x,y+1,"down"):#down
         d.remove("down")
-    #print("d:",d)
+    print("d before:",d)
+
+    if (are_snakesheades_around(snake_heads,x+1,y) and len(d)>1):
+        d.remove("right")
+    if (are_snakesheades_around(snake_heads,x-1,y) and len(d)>1):
+        d.remove("left")
+    if (are_snakesheades_around(snake_heads,x,y-1) and len(d)>1):
+        d.remove("up")
+    if (are_snakesheades_around(snake_heads,x,y+1) and len(d)>1):
+        d.remove("down")
+    print("d before:", d)
 
 
 def is_snake_body(bodys,x,y):
