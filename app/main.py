@@ -2,6 +2,7 @@ import json
 import os
 import random
 import bottle
+import other_funcs
 
 from api import ping_response, start_response, move_response, end_response
 
@@ -56,10 +57,15 @@ def move():
     """
     print(json.dumps(data))
 
-    directions = ['up', 'down', 'left', 'right']
-    direction = random.choice(directions)
-
+    #directions = ['up', 'down', 'left', 'right']
+    #direction = random.choice(directions)
+    
+    direction = other_funcs.main(data)
+    
     return move_response(direction)
+    
+
+#return move_response(direction)
 
 
 @bottle.post('/end')
