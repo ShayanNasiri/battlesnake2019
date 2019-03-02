@@ -1,4 +1,5 @@
 import math
+from random import choice
 
 
 def main(data):
@@ -54,8 +55,8 @@ def main(data):
     if len(d)<=0:
         direction = "right"
     else:
-        #direction = choice(d)
-        direction = d[0]
+        direction = choice(d)
+        #direction = d[0]
 
     return direction
 
